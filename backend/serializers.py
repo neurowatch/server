@@ -7,8 +7,15 @@ class VideoInformationSerializer(serializers.ModelSerializer):
         fields = ['id', 'object_name', 'detection_confidence']
 
 class VideoClipSerializer(serializers.ModelSerializer):
-    video_infromation = VideoInformationSerializer(many=True, read_only=True)
+    video_information = VideoInformationSerializer(many=True, read_only=False)
 
     class Meta:
-        model = VideoClip,
-        fields = ['id', 'video_path', 'video_information']
+        model = VideoClip
+        fields = ['id', 'video', 'video_information']
+
+    def create(self, validated_data):
+        video_information_data = validated_data.pop('video_information')
+        video_clip = VideoClip.objects.create(**validated_data)
+        for video_info_data in video_information_data:
+            VideoInformation.objects.create(video=video_clip, **video_info_data)
+        return video_clip
