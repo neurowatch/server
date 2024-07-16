@@ -1,0 +1,13 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html>
+    <body>
+        {% for clip in videoclips %}
+        <div>
+            <h2>Detection date: {{clip.date}}</h2>
+            <img src="{% get_media_prefix %}{{clip.thumbnail}}" />
+        </div>
+        {% endfor %}
+    </body>
+</html>

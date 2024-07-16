@@ -7,6 +7,8 @@ from django.core.exceptions import ValidationError
 from django.conf import settings
 import logging
 import json
+import tempfile
+from django.core.files import File
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
@@ -21,23 +23,26 @@ class VideoClipSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = VideoClip
-        fields = ['id', 'video', 'video_information']
+        fields = ['id', 'video', 'thumbnail', 'date', 'video_information']
+        extra_kwargs = {
+            'thumbnail': {'required': False}
+        }
 
     def create(self, validated_data):
 
         logger.debug("------------------------")
+        logger.debug("------------------------")
         logger.debug(validated_data)
 
-        video_information_data = validated_data.pop('video_information', None)
-        if video_information_data:
-            for video_info_data in video_information_data:
-                VideoInformation.objects.create(video=video_clip, **video_info_data)
-
         video_clip = VideoClip.objects.create(**validated_data)
+        self.generate_thumbnail(video_clip)
 
         try:
             metadata = self.extract_metadata(video_clip.video)
         except ValidationError as e:
+            logger.error(e)
+            raise serializers.ValidationError({'video': str(e)})
+        except Exception as e:
             logger.error(e)
             raise serializers.ValidationError({'video': str(e)})
 
@@ -65,3 +70,22 @@ class VideoClipSerializer(serializers.ModelSerializer):
             logger.error(e)
             logger.error(e.stderr)
             raise ValidationError(str(e))
+        
+    def generate_thumbnail(self, video):
+        try:
+            with tempfile.NamedTemporaryFile(suffix='.png', delete=False) as temp_file:
+                thumb_temp_path = temp_file.name                
+                ffmpeg.input(video.video.path).filter('select', 'eq(n,0)').output(thumb_temp_path, vframes=1).overwrite_output().run()
+
+            logger.debug("-----------------")
+            logger.debug(thumb_temp_path)
+            logger.debug("-----------------")
+
+            with open(thumb_temp_path, 'rb') as temp_file:
+                thumb_file = File(temp_file)
+                video.thumbnail.save(os.path.basename(thumb_temp_path), thumb_file, save=True)
+
+            os.remove(thumb_temp_path)
+        except Exception as e:
+            logger.error(e)
+            raise e

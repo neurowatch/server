@@ -3,6 +3,8 @@ from django.core.validators import MaxValueValidator, MinValueValidator
 
 class VideoClip(models.Model):
     video = models.FileField(upload_to='videos/')
+    date = models.DateTimeField(auto_now_add=True)
+    thumbnail = models.FileField(upload_to='thumbs/')
 
 class VideoInformation(models.Model):
     video = models.ForeignKey(VideoClip, related_name='video_information', on_delete=models.CASCADE)
