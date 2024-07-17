@@ -27,6 +27,8 @@ router.register(r'videos', views.VideoClipViewSet)
 
 urlpatterns = [
     path('', views.index, name='index'),
+    path('clip/<int:clip_id>/', views.video_detail, name='video_detail'),
+    path('settings/', views.settings, name='settings'),
     path('api/', include(router.urls)),
     path('admin/', admin.site.urls),
 ]
