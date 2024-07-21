@@ -1,85 +1,55 @@
-import ffmpeg
-import os
-import io
-from rest_framework import serializers
-from .models import VideoClip, VideoInformation
-from django.core.exceptions import ValidationError
+from .models import VideoClip, DetectedObject
 from django.conf import settings
-import logging
-import json
-import tempfile
+from django.core.exceptions import ValidationError
 from django.core.files import File
+from rest_framework import serializers
+import ffmpeg
+import json
+import logging
+import os
+import tempfile
+
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
-class VideoInformationSerializer(serializers.ModelSerializer):
+class DetectedObjectSerializer(serializers.ModelSerializer):
     class Meta:
-        model = VideoInformation
-        fields = ['id', 'object_name', 'detection_confidence']
+        model = DetectedObject
+        fields = ['object_name', 'detection_confidence']
 
-class VideoClipSerializer(serializers.ModelSerializer):
-    video_information = VideoInformationSerializer(many=True, required=False)
+class VideoClipSerializer(serializers.Serializer):
 
-    class Meta:
-        model = VideoClip
-        fields = ['id', 'video', 'thumbnail', 'date', 'video_information']
-        extra_kwargs = {
-            'thumbnail': {'required': False}
-        }
+    video = serializers.FileField()
+    detected_objects = DetectedObjectSerializer(many=True, write_only=True)
+    thumbnail = serializers.FileField(required=False)
+    date = serializers.DateTimeField(required=False, read_only=True)
 
     def create(self, validated_data):
+        detected_objects = validated_data.pop('detected_objects')        
+        video = validated_data["video"][0]
+        videoClip = VideoClip.objects.create(video=video)
+        self.generate_thumbnail(videoClip)
+        for detectedObject in detected_objects:
+            detectedObject = json.loads(detectedObject.replace("'", "\""))
+            logger.debug(detectedObject)
+            logger.debug("......................")
+            DetectedObject.objects.create(video=videoClip, object_name=detectedObject["object_name"], detection_confidence=detectedObject["detection_confidence"])
 
-        logger.debug("------------------------")
-        logger.debug("------------------------")
-        logger.debug(validated_data)
-
-        video_clip = VideoClip.objects.create(**validated_data)
-        self.generate_thumbnail(video_clip)
-
-        try:
-            metadata = self.extract_metadata(video_clip.video)
-        except ValidationError as e:
-            logger.error(e)
-            raise serializers.ValidationError({'video': str(e)})
-        except Exception as e:
-            logger.error(e)
-            raise serializers.ValidationError({'video': str(e)})
-
-        for info in metadata:
-            VideoInformation.objects.create(video=video_clip, **info)
-
-        return video_clip
+        return videoClip        
     
-    def extract_metadata(self, video):
-        try:
-            file_path = os.path.normpath(os.path.join(settings.MEDIA_ROOT, video.name))
-
-            probe = ffmpeg.probe(filename=file_path)
-
-            metadata = probe.get('format', {}).get('tags', {})
-    
-            detected_objects = json.loads(metadata['description'])
-
-            logger.debug(detected_objects)
-            logger.debug("-----------------")
-
-            return detected_objects
-
-        except Exception as e:
-            logger.error(e)
-            logger.error(e.stderr)
-            raise ValidationError(str(e))
+    def to_internal_value(self, data):
+        if not "detected_objects" in data.keys():
+            raise serializers.ValidationError(
+                {"detected_objects" : "This field is required"}
+            )
+        return data
         
     def generate_thumbnail(self, video):
         try:
             with tempfile.NamedTemporaryFile(suffix='.png', delete=False) as temp_file:
                 thumb_temp_path = temp_file.name                
                 ffmpeg.input(video.video.path).filter('select', 'eq(n,0)').output(thumb_temp_path, vframes=1).overwrite_output().run()
-
-            logger.debug("-----------------")
-            logger.debug(thumb_temp_path)
-            logger.debug("-----------------")
 
             with open(thumb_temp_path, 'rb') as temp_file:
                 thumb_file = File(temp_file)
