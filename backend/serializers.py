@@ -32,8 +32,6 @@ class VideoClipSerializer(serializers.Serializer):
         self.generate_thumbnail(videoClip)
         for detectedObject in detected_objects:
             detectedObject = json.loads(detectedObject.replace("'", "\""))
-            logger.debug(detectedObject)
-            logger.debug("......................")
             DetectedObject.objects.create(video=videoClip, object_name=detectedObject["object_name"], detection_confidence=detectedObject["detection_confidence"])
 
         return videoClip        
