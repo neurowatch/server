@@ -26,11 +26,12 @@ router = routers.DefaultRouter()
 router.register(r'videos', views.VideoClipViewSet)
 
 urlpatterns = [
-    path('', views.index, name='index'),
-    path('clip/<int:clip_id>/', views.video_detail, name='video_detail'),
+    path('', views.VideoClipsView.as_view(), name='index'),
+    path('clip/<int:clip_id>/', views.VideoDetailView.as_view(), name='video_detail'),
     path('settings/', views.settings, name='settings'),
     path('api/', include(router.urls)),
     path('admin/', admin.site.urls),
+    path('test/', views.test_mail, name='test')
 ]
 
 if settings.DEBUG:

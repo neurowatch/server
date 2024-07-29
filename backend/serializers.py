@@ -1,4 +1,5 @@
 from .models import VideoClip, DetectedObject
+from .services import send_email_notification
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.files import File
@@ -33,7 +34,7 @@ class VideoClipSerializer(serializers.Serializer):
         for detectedObject in detected_objects:
             detectedObject = json.loads(detectedObject.replace("'", "\""))
             DetectedObject.objects.create(video=videoClip, object_name=detectedObject["object_name"], detection_confidence=detectedObject["detection_confidence"])
-
+        # TODO: send_email_notification()
         return videoClip        
     
     def to_internal_value(self, data):
