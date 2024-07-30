@@ -8,6 +8,7 @@ from rest_framework.parsers import JSONParser
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from django.views.generic import ListView, DetailView
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 from .services import send_email_notification
 
@@ -16,15 +17,19 @@ logger = logging.getLogger(__name__)
 
 #Django Views
 
-class VideoClipsView(ListView):
+class VideoClipsView(LoginRequiredMixin, ListView):
     model = VideoClip
     template_name = 'index.html'
     context_object_name = 'videoclips'
+    login_url = "/login/"
+    redirect_field_name = "redirect_to"
 
-class VideoDetailView(DetailView):
+class VideoDetailView(LoginRequiredMixin, DetailView):
     model = VideoClip
     template_name = 'detail.html'
     context_object_name = 'clip'
+    login_url = "/login/"
+    redirect_field_name = "redirect_to"
 
     def get_object(self, queryset=None):
         clip_id = self.kwargs.get('pk')

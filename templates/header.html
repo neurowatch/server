@@ -6,6 +6,17 @@
         <ul>
             <li><a href="{% url 'index' %}">Home</a></li>
             <li><a href="{% url 'settings' %}">Settings</a></li>
+            {% if user.is_authenticated %}
+                <li><a href="#" onclick="submitLogoutForm()">Logout</a></li>
+            {% endif %}
         </ul>
     </nav>
+    <form id="logout-form" method="post" action="{% url 'logout' %}" style="display: none;">
+        {% csrf_token %}
+    </form>
+    <script>
+        function submitLogoutForm() {
+            document.getElementById('logout-form').submit();
+        }
+    </script>
 </header>
