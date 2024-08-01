@@ -10,6 +10,13 @@
                 <li><a href="#" onclick="submitLogoutForm()">Logout</a></li>
             {% endif %}
         </ul>
+        <div>Client status: 
+            {% if client_status.is_up %}
+                On
+            {% else %}
+                Off
+            {% endif %}
+        </div>
     </nav>
     <form id="logout-form" method="post" action="{% url 'logout' %}" style="display: none;">
         {% csrf_token %}

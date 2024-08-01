@@ -1,4 +1,4 @@
-from .models import VideoClip, DetectedObject
+from .models import VideoClip, DetectedObject, Settings
 from .services import send_email_notification
 from django.conf import settings
 from django.core.exceptions import ValidationError
@@ -29,13 +29,21 @@ class VideoClipSerializer(serializers.Serializer):
     def create(self, validated_data):
         detected_objects = validated_data.pop('detected_objects')        
         video = validated_data["video"][0]
-        videoClip = VideoClip.objects.create(video=video)
-        self.generate_thumbnail(videoClip)
+        video_clip = VideoClip.objects.create(video=video)
+        self.generate_thumbnail(video_clip)
         for detectedObject in detected_objects:
             detectedObject = json.loads(detectedObject.replace("'", "\""))
-            DetectedObject.objects.create(video=videoClip, object_name=detectedObject["object_name"], detection_confidence=detectedObject["detection_confidence"])
-        # TODO: send_email_notification()
-        return videoClip        
+            DetectedObject.objects.create(video=video_clip, object_name=detectedObject["object_name"], detection_confidence=detectedObject["detection_confidence"])
+
+        settings = Settings.objects.first()
+
+        if settings.emails_enabled:
+            send_email_notification(settings.recipient_address, video_clip.id)
+        
+        if settings.push_notification_enabled:
+            pass
+
+        return video_clip        
     
     def to_internal_value(self, data):
         if not "detected_objects" in data.keys():

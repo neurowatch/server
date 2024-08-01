@@ -29,12 +29,13 @@ router.register(r'videos', views.VideoClipViewSet)
 urlpatterns = [
     path('', views.VideoClipsView.as_view(), name='index'),
     path('clip/<int:clip_id>/', views.VideoDetailView.as_view(), name='video_detail'),
-    path('settings/', views.settings, name='settings'),
+    path('settings/', views.SettingsView.as_view(), name='settings'),
     path('api/', include(router.urls)),
     path('admin/', admin.site.urls),
     path('login/', auth_views.LoginView.as_view(template_name='login.html'), name='login'),
     path('logout/', auth_views.LogoutView.as_view(), name='logout'),
     path('test/', views.test_mail, name='test'),
+    path('api/ping/', views.ClientPing.as_view(), name='ping'),
 ]
 
 if settings.DEBUG:

@@ -24,7 +24,7 @@
             </video>    
         </div>
         <div>
-            {% for object in detectedObjects %}
+            {% for object in detected_objects %}
                 <p>{{object.object_name}} - {{object.detection_confidence}}</p>
             {% endfor %}
         </div>
