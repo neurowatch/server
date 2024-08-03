@@ -3,46 +3,28 @@
 <!DOCTYPE html>
 <html>
     <head>
+        {% load bootstrap5 %}
+        {% bootstrap_css %}
+        {% bootstrap_javascript %}
+        <title>Neurowatch Settings</title>
         <style>
-            body {
+            p {
+                width: 100%;
                 display: flex;
-                flex-direction: column;
+                justify-content: space-between;
                 align-items: center;
-            }
-            header {
-                width: 100%;
-            }
-            .clips-grid-container {
-                display: grid;
-                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-                gap: 1rem;
-                width: 100%;
-                max-width: 1200px;
-                margin: 1rem 0;
-            }
-            .video-clip-item {
-                text-align: center;
-                border: 1px solid #ccc;
-                padding: 1rem;
-                border-radius: 8px;
-                box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            }
-            img {
-                max-width: 100%;
-                max-height: 500px;
-                display: block;
-                margin: 0 auto;
             }
         </style>
     </head>
     <body>
         {% include "header.html" %}
-        <div class="form-container">
-            <form method="post">
+        <div class="container">
+            <form method="post" style="width: 500px; margin: auto;">
                 {% csrf_token %}
+                <p class="h3" style="margin-bottom: 20px;">Settings:</p>
                 {{ form.as_p }}
-                <div class="form-actions">
-                    <button type="submit">Save Settings</button>
+                <div class="form-actions" style="margin-top: 50px;">
+                    <button type="submit" class="btn btn-primary" style="width: 100%;">Save Settings</button>
                 </div>
             </form>
         </div>

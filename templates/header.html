@@ -1,26 +1,43 @@
 <header>
-    <nav>
-        <div class="title">
-            <h1>Neurowatch - Panel</h1>
-        </div>
-        <ul>
-            <li><a href="{% url 'index' %}">Home</a></li>
-            <li><a href="{% url 'settings' %}">Settings</a></li>
-            {% if user.is_authenticated %}
-                <li><a href="#" onclick="submitLogoutForm()">Logout</a></li>
-            {% endif %}
-        </ul>
-        <div>Client status: 
-            {% if client_status.is_up %}
-                On
-            {% else %}
-                Off
-            {% endif %}
-        </div>
-    </nav>
-    <form id="logout-form" method="post" action="{% url 'logout' %}" style="display: none;">
-        {% csrf_token %}
-    </form>
+    <style>
+        .client-status-text {
+            padding-right: 12%;
+            font-weight: bold;
+        }
+        .client-status-on {
+            color: green;
+        }
+        .client-status-off {
+            color: red;
+        }
+    </style>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark" style="margin-bottom: 10px;">
+        <div class="container-fluid">
+            <div class="title">
+                <span  class="navbar-brand mb-0 h1">Neurowatch - Panel</span >
+            </div>
+            <div class="collapse navbar-collapse">
+                <ul class="navbar-nav">
+                    <li class="nav-item"><a class="nav-link" href="{% url 'index' %}">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'settings' %}">Settings</a></li>
+                    {% if user.is_authenticated %}
+                        <li class="nav-item"><a class="nav-link" href="#" onclick="submitLogoutForm()">Logout</a></li>
+                    {% endif %}
+                </ul>    
+            </div>
+            <div class="client-status-text" style="color: white;">
+                Client status: 
+                {% if client_status.is_up %}
+                    <span class="client-status-on">On</span>
+                {% else %}
+                    <span class="client-status-off">On</span>
+                {% endif %}
+            </div>
+        </nav>
+        <form id="logout-form" method="post" action="{% url 'logout' %}" style="display: none;">
+            {% csrf_token %}
+        </form>
+    </div>
     <script>
         function submitLogoutForm() {
             document.getElementById('logout-form').submit();

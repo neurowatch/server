@@ -3,49 +3,28 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <style>
-            body {
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-            }
-            header {
-                width: 100%;
-            }
-            .clips-grid-container {
-                display: grid;
-                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-                gap: 1rem;
-                width: 100%;
-                max-width: 1200px;
-                margin: 1rem 0;
-            }
-            .video-clip-item {
-                text-align: center;
-                border: 1px solid #ccc;
-                padding: 1rem;
-                border-radius: 8px;
-                box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            }
-            img {
-                max-width: 100%;
-                max-height: 500px;
-                display: block;
-                margin: 0 auto;
-            }
-        </style>
+        {% load bootstrap5 %}
+        {% bootstrap_css %}
+        {% bootstrap_javascript %}
+        <title>Neurowatch Dashboard</title>
     </head>
     <body>
         {% include "header.html" %}
-        <div class="clips-grid-container">
-            {% for clip in videoclips %}
-            <div class="video-clip-item">
-                <a href="{% url 'video_detail' clip.id %}"> 
-                    <h2>Detection date: {{clip.date}}</h2>
-                    <img src="{% get_media_prefix %}{{clip.thumbnail}}" />    
-                </a>
+        <div class="container">
+            <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4">
+                {% for clip in videoclips %}
+                <div class ="col mb-5">
+                    <div class="card">
+                        <div class="card-body">
+                            <a href="{% url 'video_detail' clip.id %}" class="text-decoration-none" style="color: black">
+                                <img src="{% get_media_prefix %}{{clip.thumbnail}}" class="card-img-top" />
+                                <p class="card-text">Detection date: {{clip.date}}</p>    
+                            </a>    
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}    
             </div>
-            {% endfor %}    
         </div>
     </body>
 </html>

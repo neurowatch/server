@@ -3,6 +3,10 @@
 <!DOCTYPE html>
 <html>
     <head>
+        {% load bootstrap5 %}
+        {% bootstrap_css %}
+        {% bootstrap_javascript %}
+        <title>Neurowatch VideoClip</title>
         <style>
         header {
             width: 100%;
@@ -18,15 +22,25 @@
     </head>
     <body>
         {% include "header.html" %}
-        <div>
-            <video controls>
+        <div class="container">
+            <video controls style="width: auto; height: 500px; margin-bottom: 20px;">
                 <source src="{% get_media_prefix %}{{clip.video}}" type="video/mp4">
-            </video>    
-        </div>
-        <div>
-            {% for object in detected_objects %}
-                <p>{{object.object_name}} - {{object.detection_confidence}}</p>
-            {% endfor %}
+            </video>
+            <p class="h3" style="margin-bottom: 20px;">Detection date: {{clip.date}}</p>
+            <table class="table">
+                <thead>
+                    <th scope="col">Detected object</th>
+                    <th scope="col">Detection confidence</th>
+                </thead>
+                <tbody>
+                    {% for object in detected_objects %}
+                        <tr>
+                           <td>{{object.object_name}}</td> 
+                           <td>{{object.detection_confidence}}</td>
+                        </tr>
+                    {% endfor %}    
+                </tbody>
+            </table>
         </div>
     </body>
 </html>
