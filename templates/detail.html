@@ -6,6 +6,7 @@
         {% load bootstrap5 %}
         {% bootstrap_css %}
         {% bootstrap_javascript %}
+        {% load timestamp_format %}
         <title>Neurowatch VideoClip</title>
         <style>
         header {
@@ -23,7 +24,7 @@
     <body>
         {% include "header.html" %}
         <div class="container">
-            <video controls style="width: auto; height: 500px; margin-bottom: 20px;">
+            <video id="videoPlayer" controls style="width: auto; height: 500px; margin-bottom: 20px;">
                 <source src="{% get_media_prefix %}{{clip.video}}" type="video/mp4">
             </video>
             <p class="h3" style="margin-bottom: 20px;">Detection date: {{clip.date}}</p>
@@ -31,16 +32,32 @@
                 <thead>
                     <th scope="col">Detected object</th>
                     <th scope="col">Detection confidence</th>
+                    <th scope="col">Detected at</th>
                 </thead>
                 <tbody>
                     {% for object in detected_objects %}
                         <tr>
                            <td>{{object.object_name}}</td> 
                            <td>{{object.detection_confidence}}</td>
+                           <td><a href="#" class="timestampFields" data-time="{{object.timestamp}}">{{object.timestamp|timestamp_format}}</a></td>
                         </tr>
                     {% endfor %}    
                 </tbody>
             </table>
         </div>
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const videoPlayer = document.getElementById('videoPlayer');
+                const timestampFields = document.querySelectorAll('.timestampFields');
+
+                timestampFields.forEach(function(timestampField) {
+                    timestampField.addEventListener('click', function(event) {
+                        event.preventDefault();
+                        videoPlayer.currentTime = timestampField.dataset.time;
+                        videoPlayer.play();
+                    });
+                });
+            });
+        </script>
     </body>
 </html>

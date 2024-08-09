@@ -9,6 +9,8 @@ class VideoClip(models.Model):
 class DetectedObject(models.Model):
     video = models.ForeignKey(VideoClip, on_delete=models.CASCADE)
     object_name = models.CharField(max_length=100)
+    detected_in_frame = models.IntegerField()
+    timestamp = models.IntegerField()
     detection_confidence = models.FloatField(validators=[MinValueValidator(0.0), MaxValueValidator(1.0)])
 
 class ClientStatus(models.Model):

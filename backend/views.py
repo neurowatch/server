@@ -1,19 +1,20 @@
-from django.shortcuts import render, get_object_or_404
-import logging
-from rest_framework import viewsets, status
-from rest_framework.views import APIView
-from rest_framework.response import Response
+from .forms import SettingsForm
 from .models import VideoClip, DetectedObject, ClientStatus, Settings
 from .serializers import VideoClipSerializer
-from rest_framework.authentication import TokenAuthentication
-from rest_framework.permissions import IsAuthenticated
+from django.contrib.auth import authenticate
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.shortcuts import get_object_or_404
+from django.urls import reverse_lazy
+from django.utils import timezone
 from django.views.generic import ListView, DetailView
 from django.views.generic.edit import UpdateView 
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.utils import timezone
-from django.urls import reverse_lazy
-from .services import send_email_notification
-from .forms import SettingsForm
+from rest_framework import viewsets, status
+from rest_framework.authtoken.models import Token
+from rest_framework.authentication import TokenAuthentication, BasicAuthentication
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.views import APIView
+import logging
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
@@ -82,6 +83,8 @@ class ClientPing(APIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
 
+    queryset = ClientStatus.objects.get_or_create()
+
     def post(self, request, *args, **kwargs):
         client_status, created = ClientStatus.objects.get_or_create()
         logger.debug(f"Client Status: {client_status}")
@@ -89,6 +92,16 @@ class ClientPing(APIView):
         client_status.last_ping = timezone.now()
         client_status.save()
         return Response(status=status.HTTP_200_OK)
+    
+class APILogin(APIView):
 
-def test_mail(request):
-    send_email_notification()
+    def post(self, request, *args, **kwargs):
+
+        username = request.data.get('username')
+        password = request.data.get('password')
+        user = authenticate(username=username, password=password)
+        if user is not None:
+            token, created = Token.objects.get_or_create(user=user)
+            return Response({'token': token.key}, status=status.HTTP_200_OK)
+        else:
+            return Response({'error': 'Authentication Failed'}, status=status.HTTP_401_UNAUTHORIZED)
