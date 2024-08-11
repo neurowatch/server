@@ -5,7 +5,7 @@ import tempfile
 import json
 from django.core.files import File
 from .models import VideoClip, DetectedObject, Settings
-from .services import send_email_notification
+from .services import send_email
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
@@ -54,7 +54,7 @@ def obtain_timestamp(video_clip, frame_number):
 def send_email_notification(video_clip):
     settings = Settings.objects.first()
     if settings.emails_enabled:
-        send_email_notification(settings.recipient_address, video_clip.id)
+        send_email(settings.recipient_address, video_clip.id)
 
 def send_push_notification(video_clip):
     settings = Settings.objects.first()

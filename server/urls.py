@@ -25,6 +25,7 @@ from backend import views
 
 router = routers.DefaultRouter()
 router.register(r'videos', views.VideoClipViewSet)
+router.register(r'settings', views.SettingsViewSet)
 
 urlpatterns = [
     path('', views.VideoClipsView.as_view(), name='index'),

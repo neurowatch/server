@@ -14,6 +14,7 @@ from rest_framework.authentication import TokenAuthentication, BasicAuthenticati
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.exceptions import MethodNotAllowed
 import logging
 
 logging.basicConfig(level=logging.DEBUG)
@@ -105,3 +106,12 @@ class APILogin(APIView):
             return Response({'token': token.key}, status=status.HTTP_200_OK)
         else:
             return Response({'error': 'Authentication Failed'}, status=status.HTTP_401_UNAUTHORIZED)
+        
+class SettingsViewSet(viewsets.ModelViewSet):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    queryset = Settings.objects.first()
+
+    def destroy(self, request, *args, **kwargs):
+        raise MethodNotAllowed('DELETE')
