@@ -25,7 +25,8 @@ SECRET_KEY = 'django-insecure-zkjmj#ton*%id9h*pr=yeqv=o--)q_d!y*ll1hev5y($cv35t0
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+# For testing only
+ALLOWED_HOSTS = ['192.168.1.20']
 
 
 # Application definition
@@ -141,6 +142,8 @@ EMAIL_HOST_PASSWORD=''
 
 # Authentication
 REST_FRAMEWORK = {
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 10,
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.TokenAuthentication'
     ]
@@ -149,5 +152,3 @@ REST_FRAMEWORK = {
 LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = 'login'
-
-# AUTH_USER_MODEL='backend.NeurowatchUser'

@@ -101,6 +101,8 @@ class APILogin(APIView):
         username = request.data.get('username')
         password = request.data.get('password')
         user = authenticate(username=username, password=password)
+        logger.debug(f'Sandunga')
+        logger.debug(f'{user} {username} {password}')
         if user is not None:
             token, created = Token.objects.get_or_create(user=user)
             return Response({'token': token.key}, status=status.HTTP_200_OK)
@@ -111,7 +113,11 @@ class SettingsViewSet(viewsets.ModelViewSet):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
 
-    queryset = Settings.objects.first()
+    queryset = Settings.objects.all()
+
+    def get_queryset(self):
+        # Return a queryset with only the first Settings instance
+        return Settings.objects.filter(pk=Settings.objects.first().pk) if Settings.objects.exists() else Settings.objects.none()
 
     def destroy(self, request, *args, **kwargs):
         raise MethodNotAllowed('DELETE')

@@ -11,10 +11,16 @@ logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 def create_video_clip(video):
+    '''
+        Saves the video clip
+    '''
     video_clip = VideoClip.objects.create(video=video)
     return video_clip
 
 def generate_thumbnail(video_clip):
+    '''
+        Uses the first frame of the video as thumbnail
+    '''
     try:
         with tempfile.NamedTemporaryFile(suffix='.png', delete=False) as temp_file:
             thumb_temp_path = temp_file.name                
@@ -30,7 +36,12 @@ def generate_thumbnail(video_clip):
         raise 
         
 def create_detected_objects(video_clip, detected_objects):
+    '''
+        Saves the detected objects from the video clip
+    '''
+
     for detected_object in detected_objects:
+        # The detected objects are being returned as an array of json strings that need to be parsed 
         detected_object = json.loads(detected_object.replace("'", "\""))
         DetectedObject.objects.create(
             video=video_clip, 
@@ -41,6 +52,9 @@ def create_detected_objects(video_clip, detected_objects):
         )
 
 def obtain_timestamp(video_clip, frame_number):
+    '''
+        Gets the video duration from the frame rate
+    '''
     probe = ffmpeg.probe(video_clip.video.path)
     frame_rate = 0
     for stream in probe["streams"]:
@@ -52,11 +66,17 @@ def obtain_timestamp(video_clip, frame_number):
     return timestamp
 
 def send_email_notification(video_clip):
+    '''
+        Sends an email if the email notifications are enabled
+    '''
     settings = Settings.objects.first()
     if settings.emails_enabled:
         send_email(settings.recipient_address, video_clip.id)
 
 def send_push_notification(video_clip):
+    '''
+        Sends a push notification if the push notifications are enabled
+    '''
     settings = Settings.objects.first()
     if settings.push_notification_enabled:
         pass
