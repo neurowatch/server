@@ -1,4 +1,6 @@
 from django.core.mail import send_mail
+from firebase_admin import messaging
+
 import logging
 
 logging.basicConfig(level=logging.DEBUG)
@@ -21,3 +23,13 @@ def send_email(recipient, clip_id):
         )
     except:
         logger.debug("Email sending failed")
+
+def send_push(token):
+    message = messaging.Notification(
+        notification={
+            'title': 'Neurowatch Alert',
+            'body': 'Movement has been detected!',
+        },
+        token=token,
+    )
+    messaging.send(message)

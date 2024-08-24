@@ -21,3 +21,6 @@ class Settings(models.Model):
     emails_enabled = models.BooleanField(default=True)
     push_notification_enabled = models.BooleanField(default=True)
     recipient_address = models.EmailField()
+
+class FCMToken(models.Model):
+    token = models.TextField()

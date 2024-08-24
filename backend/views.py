@@ -1,5 +1,5 @@
 from .forms import SettingsForm
-from .models import VideoClip, DetectedObject, ClientStatus, Settings
+from .models import VideoClip, DetectedObject, ClientStatus, Settings, FCMToken
 from .serializers import VideoClipSerializer
 from django.contrib.auth import authenticate
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -121,3 +121,16 @@ class SettingsViewSet(viewsets.ModelViewSet):
 
     def destroy(self, request, *args, **kwargs):
         raise MethodNotAllowed('DELETE')
+
+class APIFcmToken(APIView):
+
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    queryset = FCMToken.objects.get_or_create()
+
+    def post(self, request, *args, **kwargs):
+        fcmToken, created = FCMToken.objects.get_or_create()
+        fcmToken.save()
+        return Response(status=status.HTTP_200_OK)
+

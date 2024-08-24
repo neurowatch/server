@@ -4,8 +4,8 @@ import logging
 import tempfile
 import json
 from django.core.files import File
-from .models import VideoClip, DetectedObject, Settings
-from .services import send_email
+from .models import VideoClip, DetectedObject, Settings, FCMToken
+from .services import send_email, send_push
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
@@ -79,4 +79,5 @@ def send_push_notification(video_clip):
     '''
     settings = Settings.objects.first()
     if settings.push_notification_enabled:
-        pass
+        token = FCMToken.objects.first()
+        send_push(token)
