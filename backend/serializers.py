@@ -1,7 +1,5 @@
-from .models import DetectedObject
+from .models import DetectedObject, VideoClip
 from .usecases import create_video_clip, generate_thumbnail, create_detected_objects, send_email_notification, send_push_notification
-from django.conf import settings
-from django.core.files import File
 from rest_framework import serializers
 import logging
 
@@ -20,10 +18,15 @@ class DetectedObjectSerializer(serializers.ModelSerializer):
 
 class VideoClipSerializer(serializers.Serializer):
 
+    id = serializers.IntegerField()
     video = serializers.FileField()
     detected_objects = DetectedObjectSerializer(many=True, write_only=True)
     thumbnail = serializers.FileField(required=False)
     date = serializers.DateTimeField(required=False, read_only=True)
+
+    class Meta:
+        model = VideoClip
+        fields = ['id', 'video', 'date', 'thumbnail']
 
     def create(self, validated_data):
         # Extract the detected objects

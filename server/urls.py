@@ -37,6 +37,7 @@ urlpatterns = [
     path('logout/', auth_views.LogoutView.as_view(), name='logout'),
     path('api/ping/', views.ClientPing.as_view(), name='ping'),
     path('api/login/', views.APILogin.as_view(), name='login'),
+    path('api/fcm_token/', views.APIFcmToken.as_view(), name='fcm_token'),
 ]
 
 if settings.DEBUG:

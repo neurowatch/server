@@ -80,4 +80,5 @@ def send_push_notification(video_clip):
     settings = Settings.objects.first()
     if settings.push_notification_enabled:
         token = FCMToken.objects.first()
-        send_push(token)
+        logger.debug(token.token)
+        send_push(token.token)

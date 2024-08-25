@@ -15,7 +15,7 @@ def send_email(recipient, clip_id):
             message=
                 f'''
                     Neurowatch has detected movement in a room.
-                    Check it here: http://localhost:8000/clip/{clip_id}/
+                    Check it here: http://192.168.1.20:8000/clip/{clip_id}/
                 ''',
             from_email="alert@neurowatch.com",
             recipient_list=[recipient],
@@ -25,11 +25,11 @@ def send_email(recipient, clip_id):
         logger.debug("Email sending failed")
 
 def send_push(token):
-    message = messaging.Notification(
-        notification={
-            'title': 'Neurowatch Alert',
-            'body': 'Movement has been detected!',
-        },
+    message = messaging.Message(
+        notification = messaging.Notification(
+            title="Neurowatch Alert",
+            body="Movement has been detected!",
+        ),
         token=token,
     )
     messaging.send(message)

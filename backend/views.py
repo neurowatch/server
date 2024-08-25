@@ -124,13 +124,7 @@ class SettingsViewSet(viewsets.ModelViewSet):
 
 class APIFcmToken(APIView):
 
-    authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticated]
-
-    queryset = FCMToken.objects.get_or_create()
-
     def post(self, request, *args, **kwargs):
-        fcmToken, created = FCMToken.objects.get_or_create()
-        fcmToken.save()
+        token = request.data.get('token')
+        FCMToken.objects.create(token=token)
         return Response(status=status.HTTP_200_OK)
-
