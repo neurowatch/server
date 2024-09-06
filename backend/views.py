@@ -126,5 +126,7 @@ class APIFcmToken(APIView):
 
     def post(self, request, *args, **kwargs):
         token = request.data.get('token')
+        # Delete the current token and adds a new one. This works now because there is a single user
+        FCMToken.objects.all().delete()
         FCMToken.objects.create(token=token)
         return Response(status=status.HTTP_200_OK)
